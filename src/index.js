@@ -3,19 +3,43 @@ import ReactDOM from 'react-dom';
 import './index.css';
   
   function Square(props) {
-   return (
-     <button className="square" onClick={props.onClick}>
+    
+   return props.isWin ? (
+     <button className="square winnerColor" onClick={props.onClick}>
       {props.value}
      </button>
-   )
+   ) : (
+    <button className="square" onClick={props.onClick}>
+     {props.value}
+    </button>
+  ) 
   }
   class Board extends React.Component {
+    constructor(props){
+      super(props);      
+    }
+    
+
     renderSquare(i) {
+      let winner = this.props.winner;
+      let isWin = false;
+      if(winner.length > 0){      
+        isWin = winner.findIndex(findwinner           
+        ) !== -1 ? true : false;
+      }
+      function findwinner(item){       
+        return item === i;
+      }
+      
       return (
         <Square 
           value={this.props.squares[i]}
-          onClick={()=>this.props.onClick(i)}
-          key={i}
+          onClick={()=>{
+            this.props.onClick(i);
+            console.log(this.props)
+          }}
+          isWin={isWin}
+          key={i}         
         />
       )
     } 
@@ -91,12 +115,12 @@ import './index.css';
     render() {
       const history = this.state.history;
       const current = history[this.state.stepNum];
-      const winner = calculateWinner(current.squares);
+      const winner = calculateWinner(current.squares) ? calculateWinner(current.squares) : [];
       
       const move = history.map((step, move, arr) => {
         let desc = move ? 'go to move #' + move : 'Go to game start';
-        
         let diffIndex = {};
+        
         const currStep = step.squares;
         let lastStep;
         if(move > 0){
@@ -117,8 +141,7 @@ import './index.css';
             </button>
           </li>
         ) 
-      })      
-      let myThis = this;
+      }) 
       const reverseButton = () => {
         return ( 
         <button
@@ -140,7 +163,7 @@ import './index.css';
       
       let status;
       if(winner){
-        status = 'winner: ' + winner;
+        status = 'winner: ' + winner.winner;
       }else{
         status = 'next player: ' + (this.state.isNext ? 'X' : '0' );
       }
@@ -151,6 +174,7 @@ import './index.css';
             <Board 
               squares={current.squares}
               onClick={(i) => this.handleClick(i)}
+              winner={winner}
             />
           </div>
           <div className="game-info">
@@ -184,7 +208,9 @@ import './index.css';
     for (let i = 0; i < lines.length; i++) {
       const [a, b, c] = lines[i];
       if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
-        return squares[a];
+        
+        lines[i].winner = squares[a];   
+        return lines[i];
       }
     }
     return null;
