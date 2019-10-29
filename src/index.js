@@ -15,28 +15,30 @@ import './index.css';
         <Square 
           value={this.props.squares[i]}
           onClick={()=>this.props.onClick(i)}
+          key={i}
         />
       )
-    }
-  
+    } 
     render() {
+      let boxSize = 3;
+      
+      let cols = [];
+      for(let j = 0; j < boxSize; j++){
+        let row = [];
+        for(let i = 0; i < boxSize; i++){
+          row.push (this.renderSquare(j * boxSize + i));
+        };
+        console.log(row);
+        let col =<div className="board-row" key={j}>
+            {row}          
+        </div>
+        cols.push(col);
+      }     
+      console.log(cols);
+
       return (
-        <div>          
-          <div className="board-row">
-            {this.renderSquare(0)}
-            {this.renderSquare(1)}
-            {this.renderSquare(2)}
-          </div>
-          <div className="board-row">
-            {this.renderSquare(3)}
-            {this.renderSquare(4)}
-            {this.renderSquare(5)}
-          </div>
-          <div className="board-row">
-            {this.renderSquare(6)}
-            {this.renderSquare(7)}
-            {this.renderSquare(8)}
-          </div>
+        <div>
+          {cols}
         </div>
       );
     }
@@ -51,6 +53,7 @@ import './index.css';
         }],
         stepNum: 0,
         isNext: true,
+        isReverse: false,
       };
     }
 
@@ -68,15 +71,21 @@ import './index.css';
         }]),
         stepNum: history.length,
         isNext: !this.state.isNext,
-      });
-      console.log(history);
+      });     
     }
 
     jumpTo(step){
       this.setState({
         stepNum: step,
         isNext: (step % 2) === 0,
-      });
+      });      
+    }
+    Reverse(){
+      this.setState(
+        {
+          isReverse: !this.state.isReverse,
+        }
+      );
     }
 
     render() {
@@ -84,17 +93,51 @@ import './index.css';
       const current = history[this.state.stepNum];
       const winner = calculateWinner(current.squares);
       
-      const move = history.map((step, move) => {
-        const desc = move ? 'go to move #' + move : 'Go to game start';
+      const move = history.map((step, move, arr) => {
+        let desc = move ? 'go to move #' + move : 'Go to game start';
+        
+        let diffIndex = {};
+        const currStep = step.squares;
+        let lastStep;
+        if(move > 0){
+          lastStep = arr[move-1].squares;
+          for(let i = 0; i < lastStep.length; i++){
+            if(currStep[i] !== lastStep[i]){
+              diffIndex.x = Math.floor(i / 3)  + 1;
+              diffIndex.y = i % 3 + 1;
+            }
+          }
+          desc += `回到坐标${diffIndex.x}、${diffIndex.y}`;
+        }
+
         return (
           <li key={move}>
-            <button onClick={() => this.jumpTo(move)}>
-              {desc}
+            <button onClick={() => this.jumpTo(move)} index={move} className={move === this.state.stepNum ? 'color': ''}>
+              {desc} 
             </button>
           </li>
         ) 
-      })
-
+      })      
+      let myThis = this;
+      const reverseButton = () => {
+        return ( 
+        <button
+          onClick={()=>{
+            console.log(this);
+            this.Reverse();
+          }}
+        >
+          toggle
+        </button>);
+      }
+        
+          
+      if(this.state.isReverse){
+        move.sort((itemLast, itemNext) => {
+          return (itemLast.key > itemNext.key) ? -1 : 1;         
+        })
+      }     
+      
       let status;
       if(winner){
         status = 'winner: ' + winner;
@@ -113,6 +156,7 @@ import './index.css';
           <div className="game-info">
             <div>{status}</div>
             <ol>{move}</ol>
+            <div>{reverseButton()}</div>
           </div>
         </div>
       );
