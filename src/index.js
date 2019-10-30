@@ -162,8 +162,10 @@ import './index.css';
       }     
       
       let status;
-      if(winner){
+      if(winner.length){
         status = 'winner: ' + winner.winner;
+      }else if(this.state.stepNum === 9){
+        status = '平局';
       }else{
         status = 'next player: ' + (this.state.isNext ? 'X' : '0' );
       }
