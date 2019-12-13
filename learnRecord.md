@@ -58,12 +58,14 @@
         <span>我是代码块</span>
     </div>`
 =========================================
-```flow
-st=>start: 开始
-op=>operation: My Operation
-cond=>condition: Yes or No?
-e=>end
-st->op->cond
-cond(yes)->e
-cond(no)->op
-&```
+15. Form 内加入 非 from.item, 调整样式 后发现，自己写的部分被后面的元素覆盖掉，
+    原因： <Col> 加了span之后自动添加了浮动，导致后面的元素覆盖在前一个元素上
+16. 自定义上传组件，组件自身需要的数据，跟form需要的数据不一致，自身所需数据存state,导致重置表单不能重置掉state,
+    处理办法： 由父组件传入一个 reset，重置表单的时候，同时改变reset，
+        在子组件的 **component Will Receive Props**周期判断reset，
+        根据reset重置state
+17. 弹出的模态框的表单，点击取消之后之前的信息依旧显示，
+    原因：1. 数据录入控件，自带state, 使用时未对其值进行控制，所有一直保留了 state
+         2. upload 组件，state中存在fileList, 未对fileList进行控制
+    处理办法： 对fileList 进行控制
+    收获： F12 调试，可以查看组件内state, 组件不从新生成 state不重置
