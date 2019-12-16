@@ -69,3 +69,4 @@
          2. upload 组件，state中存在fileList, 未对fileList进行控制
     处理办法： 对fileList 进行控制
     收获： F12 调试，可以查看组件内state, 组件不从新生成 state不重置
+18. react 路由监控，在layout里面的**componentWillReceiveProps** 对比pathname,
